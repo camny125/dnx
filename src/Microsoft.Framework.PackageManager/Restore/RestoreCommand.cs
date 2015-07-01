@@ -78,6 +78,9 @@ namespace Microsoft.Framework.PackageManager
 
         public async Task<bool> Execute()
         {
+            ErrorMessages.Clear();
+            InformationMessages.Clear();
+
             ScriptExecutor.Report = Reports.Information;
 
             if (!RestoreDirectories.Any())

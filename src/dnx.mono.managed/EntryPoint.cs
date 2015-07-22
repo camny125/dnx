@@ -8,8 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Threading;
-using dnx.host;
-using Microsoft.Framework.Runtime;
+using Microsoft.Dnx.Host;
+using Microsoft.Dnx.Runtime;
 
 public class EntryPoint
 {
@@ -122,22 +122,22 @@ public class EntryPoint
 
         if (argument.Equals(".", StringComparison.Ordinal))
         {
-            // "dnx . run" --> "dnx --appbase . Microsoft.Framework.ApplicationHost run"
+            // "dnx . run" --> "dnx --appbase . Microsoft.Dnx.ApplicationHost run"
             expandedArgs.Add(argument);
-            expandedArgs.Add("Microsoft.Framework.ApplicationHost");
+            expandedArgs.Add("Microsoft.Dnx.ApplicationHost");
             return;
         }
 
         if (string.Equals(Path.GetFileName(argument), "project.json", StringComparison.OrdinalIgnoreCase))
         {
             expandedArgs.Add(Path.GetDirectoryName(Path.GetFullPath(argument)));
-            expandedArgs.Add("Microsoft.Framework.ApplicationHost");
+            expandedArgs.Add("Microsoft.Dnx.ApplicationHost");
             return;
         }
 
-        // "dnx run" --> "dnx --appbase . Microsoft.Framework.ApplicationHost run"
+        // "dnx run" --> "dnx --appbase . Microsoft.Dnx.ApplicationHost run"
         expandedArgs.Add(".");
-        expandedArgs.Add("Microsoft.Framework.ApplicationHost");
+        expandedArgs.Add("Microsoft.Dnx.ApplicationHost");
         expandedArgs.Add(argument);
     }
 

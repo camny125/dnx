@@ -196,6 +196,26 @@ TEST(parameter_expansion, ExpandCommandLineArguments_should_expand_project_to_ap
     test_ExpandCommandLineArguments(args, true, expected_expanded_args);
 }
 
+TEST(parameter_expansion, ExpandCommandLineArguments_expand_project_should_check_exact_project_json_name)
+{
+    dnx::char_t* args[]
+    { _X("-p"), _X("my_project.json"), _X("cmd") };
+    std::vector<const dnx::char_t*> expected_expanded_args(
+    { _X("--appbase"), _X("my_project.json"), _X("Microsoft.Framework.ApplicationHost"), _X("cmd") });
+
+    test_ExpandCommandLineArguments(args, true, expected_expanded_args);
+}
+
+TEST(parameter_expansion, ExpandCommandLineArguments_expand_project_should_check_exact_project_json_name_in_path)
+{
+    dnx::char_t* args[]
+    { _X("-p"), _X("C:\\MyApp\\my_project.json"), _X("cmd") };
+    std::vector<const dnx::char_t*> expected_expanded_args(
+    { _X("--appbase"), _X("C:\\MyApp\\my_project.json"), _X("Microsoft.Framework.ApplicationHost"), _X("cmd") });
+
+    test_ExpandCommandLineArguments(args, true, expected_expanded_args);
+}
+
 TEST(parameter_expansion, ExpandCommandLineArguments_should_ignore_project_after_bootstrapper_commands)
 {
     dnx::char_t* args[]

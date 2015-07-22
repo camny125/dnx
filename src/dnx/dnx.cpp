@@ -87,8 +87,6 @@ int BootstrapperOptionValueNum(const dnx::char_t* pszCandidate)
     return -1;
 }
 
-
-
 size_t FindAppBaseOrNonHostOption(size_t argc, dnx::char_t**argv)
 {
     for (size_t i = 0; i < argc; i++)
@@ -144,7 +142,7 @@ void ExpandProject(const dnx::char_t* project_path, std::vector<const dnx::char_
     auto split_idx = split_path(project_path);
 
     // note that we split the path first and check the file name to handle paths like c:\MyApp\my_project.json
-    if (string_ends_with_ignore_case(project_path + (split_idx < 0 ? 0 : split_idx), _X("project.json")))
+    if (strings_equal_ignore_case(project_path + (split_idx < 0 ? 0 : split_idx + 1), _X("project.json")))
     {
         // "dnx /path/project.json run" --> "dnx --appbase /path/ Microsoft.Framework.ApplicationHost run"
         AppendAppbaseFromFile(project_path, expanded_args);

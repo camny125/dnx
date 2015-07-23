@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Framework.PackageManager.Restore.NuGet;
 using Microsoft.Framework.Runtime;
@@ -13,6 +14,16 @@ namespace Microsoft.Framework.PackageManager
 {
     public static class PackageSourceUtils
     {
+        // Fragment of regex from https://tools.ietf.org/html/rfc3986#page-50
+        public static bool IsLocalFileSystem(this PackageSource source)
+        {
+            // NOTE(anurse):
+            //  We only support http(s) based remote sources. There's no such thing as
+            //  an "ftp" or "gopher" NuGet Feed URL ... yet :P
+            return !source.Source.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                !source.Source.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+        }
+
         public static List<PackageSource> GetEffectivePackageSources(IPackageSourceProvider sourceProvider,
             IEnumerable<string> sources, IEnumerable<string> fallbackSources)
         {
@@ -30,7 +41,8 @@ namespace Microsoft.Framework.PackageManager
         public static IPackageFeed CreatePackageFeed(PackageSource source, bool noCache, bool ignoreFailedSources,
             Reports reports)
         {
-            if (new Uri(source.Source).IsFile)
+            // Check if the feed is a URL
+            if (source.IsLocalFileSystem())
             {
                 return PackageFolderFactory.CreatePackageFolderFromPath(source.Source, ignoreFailedSources, reports);
             }

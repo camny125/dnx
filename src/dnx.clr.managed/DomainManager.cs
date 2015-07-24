@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
 using dnx.clr.managed;
+using dnx.host;
 using Microsoft.Framework.Runtime;
 using Microsoft.Framework.Runtime.Common.Impl;
 using Microsoft.Framework.Runtime.Json;
@@ -36,12 +37,34 @@ public class DomainManager : AppDomainManager
             Environment.SetEnvironmentVariable(EnvironmentNames.AppBase, _info.ApplicationBase);
         }
 
-        var version = DetermineDnxVersion(_info.ApplicationBase);
+        appDomainInfo.ApplicationBase = Environment.GetEnvironmentVariable(EnvironmentNames.DefaultLib);
+        appDomainInfo.TargetFrameworkName = DetermineAppDomainTargetFramework();
+    }
+
+    private string DetermineAppDomainTargetFramework()
+    {
+        // Check if the native bootstrapper gave us a framework name
+        string frameworkName = Environment.GetEnvironmentVariable(EnvironmentNames.Framework);
+        FrameworkName framework;
+        Version version;
+        if (!string.IsNullOrEmpty(frameworkName) &&
+            FrameworkNameUtility.TryParseFrameworkName(frameworkName, out framework) &&
+            framework.Identifier.Equals(FrameworkNames.LongNames.Dnx, StringComparison.OrdinalIgnoreCase))
+        {
+            // It's a DNX framework! So just use that version as the .NET version
+            version = framework.Version;
+        }
+        else
+        {
+            // Calculate it from project.json
+            version = SelectHighestSupportedDnxVersion(_info.ApplicationBase);
+        }
+
+        // Now that we have a version, build the TFMs and the AppDomain quirking mode TFM
         _dnxTfm = new FrameworkName(FrameworkNames.LongNames.Dnx, version);
         Logger.TraceInformation($"[{nameof(DomainManager)}] Using Desktop CLR v{version}");
 
-        appDomainInfo.ApplicationBase = Environment.GetEnvironmentVariable(EnvironmentNames.DefaultLib);
-        appDomainInfo.TargetFrameworkName = FrameworkNames.LongNames.NetFramework + ", Version=v" + version.ToString();
+        return FrameworkNames.LongNames.NetFramework + ", Version=v" + version.ToString();
     }
 
     public override HostExecutionContextManager HostExecutionContextManager
@@ -71,7 +94,7 @@ public class DomainManager : AppDomainManager
         return RuntimeBootstrapper.Execute(argv, _dnxTfm);
     }
 
-    private Version DetermineDnxVersion(string applicationBase)
+    private Version SelectHighestSupportedDnxVersion(string applicationBase)
     {
         var projectPath = Path.Combine(applicationBase, "project.json");
         if (!File.Exists(projectPath))

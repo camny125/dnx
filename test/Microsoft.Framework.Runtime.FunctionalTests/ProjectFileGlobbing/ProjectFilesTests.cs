@@ -3,6 +3,7 @@
 
 using System.IO;
 using Microsoft.Framework.Runtime.FunctionalTests.Utilities;
+using Microsoft.Framework.Runtime.Internal;
 
 namespace Microsoft.Framework.Runtime.FunctionalTests.ProjectFileGlobbing
 {
@@ -10,7 +11,7 @@ namespace Microsoft.Framework.Runtime.FunctionalTests.ProjectFileGlobbing
     {
         protected override ProjectFilesCollection CreateFilesCollection(string jsonContent, string projectDir)
         {
-            var project = Project.GetProject(
+            var project = ProjectUtilities.GetProject(
                 jsonContent,
                 "testproject",
                 Path.Combine(Root.DirPath, PathHelper.NormalizeSeparator(projectDir), "project.json"));

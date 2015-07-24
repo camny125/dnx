@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Versioning;
-using System.Text;
 using Microsoft.Framework.Runtime.Compilation;
 using Microsoft.Framework.Runtime.Helpers;
 using Microsoft.Framework.Runtime.Json;
@@ -154,15 +153,6 @@ namespace Microsoft.Framework.Runtime
             return true;
         }
 
-        public static Project GetProject(string json, string projectName, string projectPath, ICollection<DiagnosticMessage> diagnostics = null)
-        {
-            var ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
-
-            var project = GetProjectFromStream(ms, projectName, projectPath, diagnostics);
-
-            return project;
-        }
-
         internal static Project GetProjectFromStream(Stream stream, string projectName, string projectPath, ICollection<DiagnosticMessage> diagnostics = null)
         {
             var project = new Project();
@@ -305,7 +295,7 @@ namespace Microsoft.Framework.Runtime
                 project.Repository = repository
                     .Keys
                     .ToDictionary(
-                        key => key, 
+                        key => key,
                         key => repository.ValueAsString(key).Value);
             }
 

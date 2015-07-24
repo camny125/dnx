@@ -12,6 +12,7 @@ namespace Microsoft.Framework.PackageManager.Tests
         [Theory]
         [InlineData(@"C:\\foo\\bar", true)]
         [InlineData(@".\foo\bar", true)]
+        [InlineData(@"..\foo\bar", true)]
         [InlineData(@"foo\bar", true)]
         [InlineData(@"/var/NuGet/packages", true)]
         [InlineData(@"foo/bar", true)]
